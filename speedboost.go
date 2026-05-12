@@ -27,8 +27,8 @@ var (
 
 // SharedLibrary represents a shared library that has been loaded and is ready to use.
 type SharedLibrary struct {
-	ptr unsafe.Pointer
-	f   *os.File
+	ptr  unsafe.Pointer
+	path string
 }
 
 func (l *SharedLibrary) handle() unsafe.Pointer {
@@ -38,11 +38,10 @@ func (l *SharedLibrary) handle() unsafe.Pointer {
 // Unload can be called after the already loaded library is no longer needed.
 func (l *SharedLibrary) Unload() {
 	ffi.FreeLibrary(l.ptr)
-	l.f.Close()
-	os.Remove(l.f.Name())
+	os.Remove(l.path)
 
 	l.ptr = nil
-	l.f = nil
+	l.path = ""
 }
 
 // GetSymbol returns a pointer to an exported function in the shared library.
@@ -60,7 +59,6 @@ func LoadLibrary(libBinary []byte) (*SharedLibrary, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer os.Remove(f.Name())
 	defer f.Close()
 
 	// Copy data to file
@@ -75,8 +73,8 @@ func LoadLibrary(libBinary []byte) (*SharedLibrary, error) {
 	}
 
 	return &SharedLibrary{
-		ptr: lib,
-		f:   f,
+		ptr:  lib,
+		path: f.Name(),
 	}, nil
 }
 

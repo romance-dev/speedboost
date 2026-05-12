@@ -19,6 +19,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer lib.Unload()
 
 	addPtr := lib.GetSymbol("multiply")
 
@@ -27,12 +28,10 @@ func main() {
 	// Call Function
 	var result float64
 
-	err = sb.CallFunction(cifAdd, addPtr, Ptr(&result), Ptr(new(float64(40))), Ptr(new(float64(2))))
+	err = sb.CallFunction(cifAdd, addPtr, Ptr(&result), Ptr(new(40.0)), Ptr(new(2.0)))
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("add(40, 2) = %f\n", result) // 80
-
-	lib.Unload()
+	fmt.Printf("multiply(40, 2) = %f\n", result) // 80.0
 }

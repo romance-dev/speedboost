@@ -11,12 +11,15 @@
 
 Call any function from a shared library that is C ABI compatible (i.e. you can build with C, Zig, Rust etc).
 
-It is CGO free and less overheard than [Purego](https://github.com/ebitengine/purego).
+It is CGO free and has less overheard than [Purego](https://github.com/ebitengine/purego).
 
 After factoring in the overhead of calling a shared library, you may find that it is faster than
-the equivalent Go implementation.
+the equivalent Go implementation: https://niklas-heer.github.io/speed-comparison
+
 
 See the example project for more details.
+
+### C Library programmed in Zig (cross-platform)
 
 ```zig
 
@@ -28,6 +31,8 @@ export fn multiply(a: f64, b: f64) callconv(.c) f64 {
 }
 ```
 
+### Go code consuming Library
+
 ```go
 type Ptr = unsafe.Pointer
 
@@ -36,26 +41,24 @@ type Ptr = unsafe.Pointer
 var sharedLibrary []byte
 
 func main() {
-lib, err := sb.LoadLibrary(sharedLibrary)
-if err != nil {
-panic(err)
-}
+    lib, err := sb.LoadLibrary(sharedLibrary)
+    if err != nil {
+        panic(err)
+    }
+    defer lib.Unload()
 
-addPtr := lib.GetSymbol("multiply")
+    addPtr := lib.GetSymbol("multiply")
 
-cifAdd := sb.SetFuncSignature(sb.DoubleTypeDescriptor, sb.DoubleTypeDescriptor, sb.DoubleTypeDescriptor)
+    cifAdd := sb.SetFuncSignature(sb.DoubleTypeDescriptor, sb.DoubleTypeDescriptor, sb.DoubleTypeDescriptor)
 
-// Call Function
-var result float64
+    // Call Function
+    var result float64
+    err = sb.CallFunction(cifAdd, addPtr, Ptr(&result), Ptr(new(40.0))), Ptr(new(2.0)))
+    if err != nil {
+        panic(err)
+    }
 
-err = sb.CallFunction(cifAdd, addPtr, Ptr(&result), Ptr(new(float64(40))), Ptr(new(float64(2))))
-if err != nil {
-panic(err)
-}
-
-fmt.Printf("add(40, 2) = %f\n", result) // 80
-
-lib.Unload()
+    fmt.Printf("multiply(40.0, 2.0) = %f\n", result) // 80.0    
 }
 
 ```
@@ -74,3 +77,7 @@ $ CGO_ENABLED=0 go run .
 $ GOOS=linux go generate ./...
 $ GOOS=linux CGO_ENABLED=0 go run .
 ```
+
+## Special Thanks
+
+[@kolkov](https://github.com/kolkov) of https://github.com/go-webgpu/goffi
