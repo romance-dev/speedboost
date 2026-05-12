@@ -11,7 +11,7 @@
 
 Call any function from a shared library that is C ABI compatible (i.e. you can build with C, Zig, Rust etc).
 
-It is CGO free and has less overheard than [Purego](https://github.com/ebitengine/purego).
+It is CGO free and has less overhead than [Purego](https://github.com/ebitengine/purego).
 
 After factoring in the overhead of calling a shared library, you may find that it is faster than
 the equivalent Go implementation: https://niklas-heer.github.io/speed-comparison
@@ -64,6 +64,8 @@ func main() {
 ```
 
 ## How to run example project
+
+Install Zig 0.16 (later versions may break `build.zig`)
 
 ```bash 
 $ go generate ./...
