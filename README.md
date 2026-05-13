@@ -19,7 +19,7 @@ the equivalent Go implementation: https://niklas-heer.github.io/speed-comparison
 
 See the example project for more details.
 
-### C Library programmed in Zig (cross-platform)
+### C Library programmed in [Zig](https://www.openmymind.net/learning_zig/) (cross-platform)
 
 ```zig
 
@@ -65,7 +65,7 @@ func main() {
 
 ## How to run example project
 
-Install Zig 0.16 (later versions may break `build.zig`)
+Install [Zig](https://www.openmymind.net/learning_zig/) 0.16 (later versions may break `build.zig`)
 
 ```bash 
 $ go generate ./...
